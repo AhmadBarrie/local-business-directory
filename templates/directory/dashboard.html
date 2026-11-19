@@ -11,8 +11,7 @@
     <tbody>
     {% for b in businesses %}
       <tr>
-        <td>{{ b.name }}</td>
-        <td>{{ b.category }}</td>
+        <td><a href="{% url 'business_detail' b.pk %}">{{ b.name }}</a></td>        <td>{{ b.category }}</td>
         <td>{{ b.area }}</td>
         <td>
           {% if b.status == "approved" %}<span class="badge bg-success">{{ b.get_status_display }}</span>

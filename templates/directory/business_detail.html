@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ business.name }}{% endblock %}
+{% block content %}
+{% if not business.is_public %}
+  <div class="alert alert-warning">This listing is <strong>{{ business.get_status_display }}</strong> and is only visible to you and administrators.</div>
+{% endif %}
+<h1 class="h3">{{ business.name }}</h1>
+<p class="text-muted">
+  {{ business.category }} | {{ business.area }} |
+  {% if average %}Average rating {{ average }} / 5 ({{ reviews|length }} review{{ reviews|length|pluralize }}){% else %}No ratings yet{% endif %}
+</p>
+<div class="row">
+  <div class="col-md-5">
+    <h2 class="h6">Address</h2><p>{{ business.address }}</p>
+    <h2 class="h6">Phone</h2><p>{{ business.phone }}</p>
+    <h2 class="h6">Opening hours</h2><p>{{ business.opening_hours|default:"Not provided" }}</p>
+  </div>
+  <div class="col-md-7">
+    <h2 class="h6">About</h2><p>{{ business.description|linebreaks }}</p>
+  </div>
+</div>
+<hr>
+<h2 class="h5">Reviews</h2>
+{% for r in reviews %}
+  <div class="border rounded p-2 mb-2">
+    <strong>{{ r.user.username }}</strong> - {{ r.rating }}/5
+    <div>{{ r.comment }}</div>
+  </div>
+{% empty %}
+  <p class="text-muted">No reviews yet.</p>
+{% endfor %}
+<a href="{% url 'home' %}" class="btn btn-outline-secondary mt-3">Back to search</a>
+{% endblock %}
