@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Add a listing{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h1 class="h3 mb-3">Add a listing</h1>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for error in form.non_field_errors %}
+        <div class="alert alert-danger">{{ error }}</div>
+      {% endfor %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary">Submit listing</button>
+      <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Cancel</a>
+      <p class="text-muted small mt-3">New listings are shown as pending until an administrator approves them.</p>
+    </form>
+  </div>
+</div>
+{% endblock %}
