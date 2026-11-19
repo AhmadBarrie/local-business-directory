@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Delete listing{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-6">
+  <h1 class="h4">Delete listing</h1>
+  <p>Are you sure you want to delete <strong>{{ object.name }}</strong>? This also removes its reviews and cannot be undone.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Yes, delete</button>
+    <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Cancel</a>
+  </form>
+</div></div>
+{% endblock %}

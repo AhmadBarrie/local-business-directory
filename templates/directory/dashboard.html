@@ -7,16 +7,21 @@
 </div>
 {% if businesses %}
   <table class="table table-striped align-middle">
-    <thead><tr><th>Name</th><th>Category</th><th>Area</th><th>Status</th></tr></thead>
+    <thead><tr><th>Name</th><th>Category</th><th>Area</th><th>Status</th><th></th></tr></thead>
     <tbody>
     {% for b in businesses %}
       <tr>
-        <td><a href="{% url 'business_detail' b.pk %}">{{ b.name }}</a></td>        <td>{{ b.category }}</td>
+        <td><a href="{% url 'business_detail' b.pk %}">{{ b.name }}</a></td>
+        <td>{{ b.category }}</td>
         <td>{{ b.area }}</td>
         <td>
           {% if b.status == "approved" %}<span class="badge bg-success">{{ b.get_status_display }}</span>
           {% elif b.status == "rejected" %}<span class="badge bg-danger">{{ b.get_status_display }}</span>
           {% else %}<span class="badge bg-warning text-dark">{{ b.get_status_display }}</span>{% endif %}
+        </td>
+        <td class="text-end">
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'business_edit' b.pk %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'business_delete' b.pk %}">Delete</a>
         </td>
       </tr>
     {% endfor %}
