@@ -1,10 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Add a listing{% endblock %}
-{% block content %}
+{% block title %}{% if object %}Edit listing{% else %}Add a listing{% endif %}{% endblock %}{% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-7">
-    <h1 class="h3 mb-3">Add a listing</h1>
-    <form method="post" novalidate>
+    <h1 class="h3 mb-3">{% if object %}Edit listing{% else %}Add a listing{% endif %}</h1>    <form method="post" novalidate>
       {% csrf_token %}
       {% for error in form.non_field_errors %}
         <div class="alert alert-danger">{{ error }}</div>
@@ -18,8 +16,7 @@
           {% endfor %}
         </div>
       {% endfor %}
-      <button type="submit" class="btn btn-primary">Submit listing</button>
-      <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Cancel</a>
+      <button type="submit" class="btn btn-primary">{% if object %}Save changes{% else %}Submit listing{% endif %}</button>      <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Cancel</a>
       <p class="text-muted small mt-3">New listings are shown as pending until an administrator approves them.</p>
     </form>
   </div>
