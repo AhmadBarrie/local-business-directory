@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from .models import Business, Category, Review
@@ -390,3 +390,41 @@ class AdminActionTests(BaseTestCase):
         self.client.post(url, {"action": "reject_listings", "_selected_action": [b.pk]})
         b.refresh_from_db()
         self.assertEqual(b.status, Business.Status.REJECTED)
+
+
+class SecurityTests(BaseTestCase):
+    def test_script_in_listing_name_is_escaped(self):
+        script = "<script>alert(1)</script>"
+        b = make_business(self.owner, self.cat, script)
+        home = self.client.get(reverse("home"))
+        self.assertNotContains(home, script)
+        self.assertContains(home, "&lt;script&gt;alert(1)&lt;/script&gt;")
+        detail = self.client.get(reverse("business_detail", args=[b.pk]))
+        self.assertNotContains(detail, script)
+
+    def test_sql_injection_style_search_is_harmless(self):
+        make_business(self.owner, self.cat, "Glam Salon")
+        response = self.client.get(reverse("home"), {"q": "' OR 1=1 --"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No results found")
+        self.assertEqual(Business.objects.count(), 1)
+
+    def test_post_without_csrf_token_is_rejected(self):
+        client = Client(enforce_csrf_checks=True)
+        client.login(username="owner", password=PASSWORD)
+        response = client.post(reverse("business_create"), {"name": "x"})
+        self.assertEqual(response.status_code, 403)
+
+    def test_passwords_are_stored_hashed(self):
+        self.assertNotEqual(self.owner.password, PASSWORD)
+        self.assertTrue(self.owner.check_password(PASSWORD))
+
+    def test_admin_is_closed_to_normal_users(self):
+        self.login()
+        response = self.client.get(reverse("admin:index"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/admin/login/", response["Location"])
+
+    def test_pages_cannot_be_framed(self):
+        response = self.client.get(reverse("home"))
+        self.assertEqual(response["X-Frame-Options"], "DENY")
