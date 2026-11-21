@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Lint
+        run: flake8 directory config --exclude=migrations --max-line-length=100
+      - name: Run tests with coverage
+        run: |
+          coverage run --source=directory --omit="*/migrations/*,*/tests.py" manage.py test
+          coverage report -m --fail-under=60
