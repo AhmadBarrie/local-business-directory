@@ -53,6 +53,7 @@ class Business(models.Model):
     address = models.CharField(max_length=255)
     area = models.CharField(max_length=100)
     phone = models.CharField(max_length=30)
+    website = models.URLField(blank=True)
     opening_hours = models.CharField(max_length=255, blank=True)
     status = models.CharField(
         max_length=10, choices=Status.choices, default=Status.PENDING

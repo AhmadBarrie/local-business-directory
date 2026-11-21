@@ -13,6 +13,7 @@
   <div class="col-md-5">
     <h2 class="h6">Address</h2><p>{{ business.address }}</p>
     <h2 class="h6">Phone</h2><p>{{ business.phone }}</p>
+    {% if business.website %}<h2 class="h6">Website</h2><p><a href="{{ business.website }}" target="_blank" rel="noopener noreferrer">{{ business.website }}</a></p>{% endif %}
     <h2 class="h6">Opening hours</h2><p>{{ business.opening_hours|default:"Not provided" }}</p>
   </div>
   <div class="col-md-7">

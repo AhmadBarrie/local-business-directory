@@ -428,3 +428,38 @@ class SecurityTests(BaseTestCase):
     def test_pages_cannot_be_framed(self):
         response = self.client.get(reverse("home"))
         self.assertEqual(response["X-Frame-Options"], "DENY")
+
+
+class WebsiteFieldTests(BaseTestCase):
+    def data(self, **overrides):
+        data = {
+            "name": "Web Shop",
+            "category": self.cat.pk,
+            "area": "Central",
+            "address": "3 Link Road",
+            "phone": "0800333444",
+            "opening_hours": "",
+            "description": "Has a site",
+            "website": "https://example.com",
+        }
+        data.update(overrides)
+        return data
+
+    def test_website_is_saved_and_shown_on_profile(self):
+        self.login()
+        self.client.post(reverse("business_create"), self.data())
+        b = Business.objects.get(name="Web Shop")
+        response = self.client.get(reverse("business_detail", args=[b.pk]))
+        self.assertContains(response, "https://example.com")
+
+    def test_website_is_optional(self):
+        self.login()
+        self.client.post(reverse("business_create"), self.data(website=""))
+        self.assertTrue(Business.objects.filter(name="Web Shop").exists())
+
+    def test_javascript_url_is_rejected(self):
+        self.login()
+        url = reverse("business_create")
+        response = self.client.post(url, self.data(website="javascript:alert(1)"))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Business.objects.filter(name="Web Shop").exists())
