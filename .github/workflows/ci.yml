@@ -22,3 +22,13 @@ jobs:
         run: |
           coverage run --source=directory --omit="*/migrations/*,*/tests.py" manage.py test
           coverage report -m --fail-under=60
+      - name: Django system check
+        run: python manage.py check
+      - name: Security scan (code)
+        run: |
+          pip install bandit
+          bandit -r directory config -x directory/tests.py,directory/migrations
+      - name: Security scan (dependencies)
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt          

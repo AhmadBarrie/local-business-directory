@@ -48,6 +48,7 @@ class BusinessForm(BootstrapMixin, forms.ModelForm):
             "area",
             "address",
             "phone",
+            "website",
             "opening_hours",
             "description",
         ]
