@@ -18,7 +18,11 @@ def home(request):
     category_slug = request.GET.get("category", "")
     area = request.GET.get("area", "").strip()
 
-    businesses = Business.objects.approved().select_related("category")
+    businesses = (
+        Business.objects.approved()
+        .select_related("category")
+        .order_by("name")
+    )
     if category_slug:
         category = Category.objects.filter(slug=category_slug).first()
         businesses = businesses.in_category(category) if category else businesses.none()
@@ -90,11 +94,6 @@ def register(request):
 
 
 class OwnerRequiredMixin(LoginRequiredMixin):
-    """Only lets a logged-in owner reach their own listings.
-
-    Other users get a 404 for listings they do not own.
-    """
-
     def get_queryset(self):
         return super().get_queryset().filter(owner=self.request.user)
 
@@ -153,7 +152,6 @@ def add_review(request, pk):
     if business.owner == request.user:
         messages.error(request, "You cannot review your own business.")
         return redirect("business_detail", pk=pk)
-
     existing = Review.objects.filter(business=business, user=request.user).first()
     form = ReviewForm(request.POST or None, instance=existing)
     if request.method == "POST" and form.is_valid():
